@@ -1,0 +1,30 @@
+package com.udemy.cleanArch.core.useCase.impl;
+
+import com.udemy.cleanArch.core.dataProvider.FindAddressByZipCode;
+import com.udemy.cleanArch.core.dataProvider.InsertCustomer;
+import com.udemy.cleanArch.core.dataProvider.SendCpfForValidation;
+import com.udemy.cleanArch.core.domain.Customer;
+import com.udemy.cleanArch.core.useCase.InsertCustomerUseCase;
+
+public class InsertCustomerUseCaseImpl implements InsertCustomerUseCase {
+
+    private final FindAddressByZipCode findAddressByZipCode;
+
+    private final InsertCustomer insertCustomer;
+
+    private final SendCpfForValidation sendCpfForValidation;
+
+    public InsertCustomerUseCaseImpl(FindAddressByZipCode findAddressByZipCode, InsertCustomer insertCustomer, SendCpfForValidation sendCpfForValidation) {
+        this.findAddressByZipCode = findAddressByZipCode;
+        this.insertCustomer = insertCustomer;
+        this.sendCpfForValidation = sendCpfForValidation;
+    }
+
+    @Override
+    public void insert(Customer customer, String zipCode) {
+        var address = findAddressByZipCode.find(zipCode);
+        customer.setAddress(address);
+        insertCustomer.insert(customer);
+        sendCpfForValidation.send(customer.getCpf());
+    }
+}
